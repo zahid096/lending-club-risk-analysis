@@ -30,7 +30,7 @@ CREATE TABLE loans (
     grade VARCHAR(2),
     sub_grade VARCHAR(3),
     purpose VARCHAR(50),
-    issue_d VARCHAR(10), -- আগে text হিসেবে রাখছি ('Dec-2018' ফরম্যাট)
+    issue_d VARCHAR(10),
     CONSTRAINT fk_loans_borrower FOREIGN KEY (borrower_id) REFERENCES borrowers (borrower_id)
 );
 
@@ -60,9 +60,7 @@ CREATE TABLE payment_status (
     CONSTRAINT fk_payment_loan FOREIGN KEY (loan_id) REFERENCES loans (loan_id)
 );
 
--- -----------------------------------------------------------
--- (ঐচ্ছিক কিন্তু সুপারিশকৃত) কমন query দ্রুত করার জন্য index
--- -----------------------------------------------------------
+-- (optional but recommended) index to speed up common queries
 CREATE INDEX idx_loans_grade ON loans (grade);
 
 CREATE INDEX idx_borrowers_state ON borrowers (state);
