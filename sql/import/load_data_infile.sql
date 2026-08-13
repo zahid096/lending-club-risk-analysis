@@ -1,26 +1,16 @@
--- =========================================================
--- Lending Club — LOAD DATA INFILE দিয়ে দ্রুত Bulk Import
--- =========================================================
--- আগে create_schema.sql রান করে টেবিল বানিয়ে নিন, তারপর এই স্ক্রিপ্ট চালান।
---
--- IMPORTANT (Windows path নোট):
---   path-এ backslash (\) থাকলে সেটাকে forward slash (/) দিয়ে লিখুন, অথবা
---   backslash ডাবল করে দিন। যেমন:
---     'C:/Users/YourName/Downloads/borrowers.csv'   ঠিক আছে
---     'C:\Users\YourName\Downloads\borrowers.csv'   ভুল হবে (escape সমস্যা)
+-- Lending Club — Fast Bulk Import with LOAD DATA INFILE
+-- First create the table by running create_schema.sql, then run this script.
 
--- ---------------------------------------------------------
--- ধাপ ০: local_infile চালু করুন (একবারই লাগবে, session-এ)
--- ---------------------------------------------------------
+-- Enable local_infile
 SET GLOBAL local_infile = 1;
 
 SHOW VARIABLES LIKE 'local_infile';
 
 USE lending_club;
 
--- ---------------------------------------------------------
--- ধাপ ১: borrowers (আগে লোড করতে হবে — বাকিরা এর উপর FK নির্ভর করে)
--- ---------------------------------------------------------
+--
+-- borrowers table
+--
 LOAD DATA LOCAL INFILE 'E:/Daily use/Job preparetion/projects/project-2/Lending Club — Loan Default Risk & Profitability Analysis/borrowers.csv' INTO
 TABLE borrowers FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' LINES TERMINATED BY '\n' IGNORE 1 LINES (
     borrower_id,
@@ -36,9 +26,7 @@ SET
     annual_income = NULLIF(@annual_income, ''),
     dti = NULLIF(@dti, '');
 
--- ---------------------------------------------------------
--- ধাপ ২: loans
--- ---------------------------------------------------------
+-- loans table
 LOAD DATA LOCAL INFILE 'E:/Daily use/Job preparetion/projects/project-2/Lending Club — Loan Default Risk & Profitability Analysis/loans.csv' INTO
 TABLE loans FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' LINES TERMINATED BY '\n' IGNORE 1 LINES (
     loan_id,
@@ -57,9 +45,7 @@ SET
     int_rate = NULLIF(@int_rate, ''),
     installment = NULLIF(@installment, '');
 
--- ---------------------------------------------------------
--- ধাপ ৩: credit_history
--- ---------------------------------------------------------
+-- credit_history table
 LOAD DATA LOCAL INFILE 'E:/Daily use/Job preparetion/projects/project-2/Lending Club — Loan Default Risk & Profitability Analysis/credit_history.csv' INTO
 TABLE credit_history FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' LINES TERMINATED BY '\n' IGNORE 1 LINES (
     borrower_id,
@@ -88,9 +74,7 @@ SET
     pub_rec_bankruptcies = NULLIF(@pub_rec_bankruptcies, ''),
     inq_last_6mths = NULLIF(@inq_last_6mths, '');
 
--- ---------------------------------------------------------
--- ধাপ ৪: payment_status
--- ---------------------------------------------------------
+-- payment_status table
 LOAD DATA LOCAL INFILE 'E:/Daily use/Job preparetion/projects/project-2/Lending Club — Loan Default Risk & Profitability Analysis/payment_status.csv' INTO
 TABLE payment_status FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' LINES TERMINATED BY '\n' IGNORE 1 LINES (
     loan_id,
@@ -101,9 +85,7 @@ TABLE payment_status FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' LINES T
 SET
     total_pymnt = NULLIF(@total_pymnt, '');
 
--- ---------------------------------------------------------
--- ধাপ ৫: যাচাই করুন — CSV-এর row সংখ্যার সাথে মিলছে কিনা
--- ---------------------------------------------------------
+-- Verify — Row number matches CSV
 SELECT 'borrowers' AS table_name, COUNT(*) AS row_count
 FROM borrowers
 UNION ALL
